@@ -6,6 +6,7 @@ export interface ContentSection {
   body: string | string[];
   items?: { title: string; desc: string }[];
   stats?: { label: string; value: string }[];
+  videoUrl?: string;
 }
 
 export interface PortfolioItem {

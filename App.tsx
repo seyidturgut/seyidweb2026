@@ -763,55 +763,78 @@ const MultimediaSlide: React.FC<{ content: any }> = ({ content }) => (
   </div>
 );
 
-const ConclusionSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="w-full flex-1 flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
-     {/* Rotating Ray Background */}
-     <motion.div 
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, ease: "linear", repeat: Infinity }}
-        className="absolute inset-[-50%] bg-[conic-gradient(from_90deg_at_50%_50%,#00000000_50%,#1a1a1a_100%)] opacity-30 pointer-events-none" 
-     />
-     
-     <motion.div
-       initial={{ scale: 0.8, opacity: 0, filter: 'blur(20px)' }}
-       animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
-       transition={{ duration: 1.2, ease: "circOut" }}
-       className="relative z-10 max-w-5xl"
-     >
-       <h2 className="text-5xl md:text-8xl font-serif mb-12 leading-tight">
-         {content.conclusion.title}
-       </h2>
-     </motion.div>
-     
-     <motion.p 
-       initial={{ opacity: 0, y: 30 }}
-       animate={{ opacity: 1, y: 0 }}
-       transition={{ delay: 0.6 }}
-       className="text-lg md:text-2xl text-gray-300 font-light mb-16 max-w-2xl mx-auto relative z-10 leading-relaxed"
-     >
-       {content.conclusion.body}
-     </motion.p>
+const ConclusionSlide: React.FC<{ content: any }> = ({ content }) => {
+  const videoId = content.conclusion.videoUrl ? content.conclusion.videoUrl.split('/').pop() : null;
 
-     <div className="flex flex-wrap justify-center gap-6 relative z-10">
-        {content.conclusion.items?.map((item: any, idx: number) => (
-          <motion.div 
-            key={idx}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 + (idx * 0.15) }}
-            className="px-8 py-4 border border-white/20 bg-black/40 backdrop-blur-xl rounded-full text-sm font-mono uppercase tracking-widest hover:border-brand-accent hover:text-brand-accent transition-all shadow-lg cursor-default"
-          >
-             {item.title}
-          </motion.div>
-        ))}
-     </div>
-      <div className="mt-12 relative z-10">
-          <a href="https://www.behance.net/seyidturgut" target="_blank" rel="noopener noreferrer" className="text-brand-accent hover:underline flex items-center gap-2">
-            View Full Portfolio on Behance <ExternalLink size={16} />
-          </a>
-      </div>
-  </div>
-);
+  return (
+    <div className="w-full flex-1 flex flex-col justify-center items-center text-center px-6 relative overflow-hidden py-10">
+       {/* Rotating Ray Background */}
+       <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+          className="absolute inset-[-50%] bg-[conic-gradient(from_90deg_at_50%_50%,#00000000_50%,#1a1a1a_100%)] opacity-30 pointer-events-none" 
+       />
+       
+       <motion.div
+         initial={{ scale: 0.8, opacity: 0, filter: 'blur(20px)' }}
+         animate={{ scale: 1, opacity: 1, filter: 'blur(0px)' }}
+         transition={{ duration: 1.2, ease: "circOut" }}
+         className="relative z-10 max-w-5xl mb-12"
+       >
+         <h2 className="text-5xl md:text-8xl font-serif leading-tight">
+           {content.conclusion.title}
+         </h2>
+       </motion.div>
+       
+       <motion.p 
+         initial={{ opacity: 0, y: 30 }}
+         animate={{ opacity: 1, y: 0 }}
+         transition={{ delay: 0.6 }}
+         className="text-lg md:text-2xl text-gray-300 font-light mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed"
+       >
+         {content.conclusion.body}
+       </motion.p>
+  
+       {videoId && (
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="w-full max-w-3xl mx-auto mb-16 relative z-10 aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black"
+        >
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src={`https://www.youtube.com/embed/${videoId}`} 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+        </motion.div>
+       )}
+  
+       <div className="flex flex-wrap justify-center gap-6 relative z-10">
+          {content.conclusion.items?.map((item: any, idx: number) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 + (idx * 0.15) }}
+              className="px-8 py-4 border border-white/20 bg-black/40 backdrop-blur-xl rounded-full text-sm font-mono uppercase tracking-widest hover:border-brand-accent hover:text-brand-accent transition-all shadow-lg cursor-default"
+            >
+               {item.title}
+            </motion.div>
+          ))}
+       </div>
+        <div className="mt-12 relative z-10">
+            <a href="https://www.behance.net/seyidturgut" target="_blank" rel="noopener noreferrer" className="text-brand-accent hover:underline flex items-center gap-2">
+              View Full Portfolio on Behance <ExternalLink size={16} />
+            </a>
+        </div>
+    </div>
+  );
+};
 
 // --- INTRO MODAL COMPONENT ---
 

@@ -86,6 +86,7 @@ export const CONTENT: Record<string, ContentData> = {
     conclusion: {
       title: "Sonuç & Handoff",
       body: "Kullanıcı empatisi ile ticari başarının kesişim noktası. Tasarımlar, yazılım ekipleri (Android/iOS) için teknik standartlarda (Responsive, Asset Export) hazırlanarak kusursuz bir geliştirme süreci sağlanmıştır.",
+      videoUrl: "https://youtu.be/CTeJEUMsNTA",
       items: [
         { title: "Ürün Stratejisti", desc: "Fikirden Pazara." },
         { title: "Developer Handoff", desc: "Teknik Uyum." },
@@ -174,6 +175,7 @@ export const CONTENT: Record<string, ContentData> = {
     conclusion: {
       title: "Conclusion & Handoff",
       body: "The intersection of user empathy and commercial success. Designs are prepared in technical standards (Responsive, Asset Export) for software teams (Android/iOS) ensuring a flawless development process.",
+      videoUrl: "https://youtu.be/9pFpiIy34VY",
       items: [
         { title: "Product Strategist", desc: "Idea to Market." },
         { title: "Developer Handoff", desc: "Technical Fit." },
