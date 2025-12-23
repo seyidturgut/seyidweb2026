@@ -407,7 +407,7 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
 // --- SLIDE COMPONENTS ---
 
 const HeroSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col justify-center items-center text-center px-4 relative perspective-1000">
+  <div className="w-full flex-1 flex flex-col justify-center items-center text-center px-4 relative perspective-1000">
     <motion.div 
       initial={{ scale: 0, opacity: 0, rotate: -45 }}
       animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -479,7 +479,7 @@ const HeroSlide: React.FC<{ content: any }> = ({ content }) => (
 );
 
 const ExecutiveSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col md:flex-row items-center justify-center gap-16 px-6 md:px-20 max-w-7xl mx-auto">
+  <div className="w-full flex-1 flex flex-col md:flex-row items-center justify-center gap-16 px-6 md:px-20 max-w-7xl mx-auto">
     <motion.div 
       className="md:w-1/2 relative"
       initial="hidden" animate="visible" variants={textReveal} custom={1}
@@ -527,7 +527,7 @@ const ExecutiveSlide: React.FC<{ content: any }> = ({ content }) => (
 
 const PortfolioSlide: React.FC<{ content: any }> = ({ content }) => {
   return (
-    <div className="h-full flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto">
+    <div className="w-full flex-1 flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto">
       <div className="mb-8">
         <span className="text-brand-accent font-mono text-sm tracking-widest">{content.portfolio.title}</span>
         <h2 className="text-4xl md:text-5xl font-serif mt-2">{content.portfolio.webTitle}</h2>
@@ -588,7 +588,7 @@ const PortfolioSlide: React.FC<{ content: any }> = ({ content }) => {
 };
 
 const UxUiSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto relative z-10">
+  <div className="w-full flex-1 flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto relative z-10">
     <motion.div 
       initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
       className="mb-12"
@@ -625,7 +625,7 @@ const UxUiSlide: React.FC<{ content: any }> = ({ content }) => (
 );
 
 const VisualSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto relative">
+  <div className="w-full flex-1 flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto relative">
     <div className="grid md:grid-cols-2 gap-20 h-[70vh] items-center">
       <div className="space-y-16 relative z-10">
         <motion.div initial="hidden" animate="visible" variants={textReveal}>
@@ -699,7 +699,7 @@ const VisualSlide: React.FC<{ content: any }> = ({ content }) => (
 );
 
 const MultimediaSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto">
+  <div className="w-full flex-1 flex flex-col justify-center px-6 md:px-20 max-w-7xl mx-auto">
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
       className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-white/10 pb-6"
@@ -764,7 +764,7 @@ const MultimediaSlide: React.FC<{ content: any }> = ({ content }) => (
 );
 
 const ConclusionSlide: React.FC<{ content: any }> = ({ content }) => (
-  <div className="h-full flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
+  <div className="w-full flex-1 flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
      {/* Rotating Ray Background */}
      <motion.div 
         animate={{ rotate: 360 }}
@@ -1102,8 +1102,8 @@ const App: React.FC = () => {
             exit="exit"
             className="absolute inset-0 w-full h-full overflow-y-auto md:overflow-hidden"
           >
-            <div className="min-h-full w-full py-24 md:py-0 flex flex-col">
-               <div className="flex-1 flex flex-col relative">
+            <div className="min-h-screen md:h-full w-full flex flex-col">
+               <div className="flex-1 flex flex-col justify-center relative py-24 md:py-0">
                   <CurrentSlideComponent content={content} />
                </div>
             </div>
