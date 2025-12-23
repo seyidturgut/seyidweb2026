@@ -5,16 +5,17 @@ import { ContentData } from '../types';
 interface AudioPlayerProps {
   uiLabels: ContentData['ui'];
   shouldPlay: boolean;
+  forcePause?: boolean;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ uiLabels, shouldPlay }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ uiLabels, shouldPlay, forcePause = false }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Watch for the 'shouldPlay' signal from the parent (Modal click)
+  // Initial auto-play trigger from Modal
   useEffect(() => {
-    if (shouldPlay && audioRef.current && !isPlaying) {
+    if (shouldPlay && audioRef.current && !isPlaying && !forcePause) {
       const playPromise = audioRef.current.play();
       if (playPromise !== undefined) {
         playPromise
@@ -36,6 +37,22 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ uiLabels, shouldPlay }) => {
       }
     }
   }, [shouldPlay]);
+
+  // Handle external interruptions (e.g. Video playing)
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (forcePause) {
+      // If forced to pause (video playing), pause audio but DON'T change isPlaying state
+      // so we know to resume later
+      audioRef.current.pause();
+    } else {
+      // If force pause is lifted AND user intended it to be playing, resume
+      if (isPlaying && shouldPlay) {
+        audioRef.current.play().catch(e => console.error("Resume failed", e));
+      }
+    }
+  }, [forcePause, isPlaying, shouldPlay]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -67,16 +84,19 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ uiLabels, shouldPlay }) => {
         
         {/* Visualizer / Status */}
         <div className="hidden md:flex items-center gap-2 text-xs font-mono text-gray-400">
-           <Activity className={`w-4 h-4 ${isPlaying ? 'text-brand-accent animate-pulse' : 'text-gray-600'}`} />
-           <span className="tracking-widest opacity-60">AUDIO EXPERIENCE</span>
+           <Activity className={`w-4 h-4 ${isPlaying && !forcePause ? 'text-brand-accent animate-pulse' : 'text-gray-600'}`} />
+           <span className="tracking-widest opacity-60">
+             {forcePause ? 'AUDIO PAUSED FOR VIDEO' : 'AUDIO EXPERIENCE'}
+           </span>
         </div>
 
         {/* Controls Container */}
-        <div className="flex items-center gap-4 bg-black/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-full shadow-2xl mx-auto md:mx-0">
+        <div className={`flex items-center gap-4 bg-black/80 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-full shadow-2xl mx-auto md:mx-0 transition-opacity duration-300 ${forcePause ? 'opacity-50' : 'opacity-100'}`}>
           
           <button 
             onClick={togglePlay}
-            className="group flex items-center gap-3 hover:text-brand-accent transition-colors duration-300"
+            disabled={forcePause}
+            className="group flex items-center gap-3 hover:text-brand-accent transition-colors duration-300 disabled:cursor-not-allowed"
             aria-label={isPlaying ? uiLabels.pause : uiLabels.play}
           >
             {isPlaying ? (

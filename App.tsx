@@ -5,6 +5,14 @@ import AudioPlayer from './components/AudioPlayer';
 import { CONTENT } from './constants';
 import { Language } from './types';
 
+// --- TYPE DEFINITIONS FOR YOUTUBE API ---
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void;
+    YT: any;
+  }
+}
+
 // --- ANIMATION VARIANTS ---
 
 const slideVariants = {
@@ -763,8 +771,67 @@ const MultimediaSlide: React.FC<{ content: any }> = ({ content }) => (
   </div>
 );
 
-const ConclusionSlide: React.FC<{ content: any }> = ({ content }) => {
+const ConclusionSlide: React.FC<{ content: any, onVideoStateChange: (playing: boolean) => void }> = ({ content, onVideoStateChange }) => {
   const videoId = content.conclusion.videoUrl ? content.conclusion.videoUrl.split('/').pop() : null;
+  const playerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize YouTube API
+  useEffect(() => {
+    if (!videoId) return;
+
+    const initPlayer = () => {
+      if (window.YT && window.YT.Player) {
+        playerRef.current = new window.YT.Player(`youtube-player-${videoId}`, {
+          height: '100%',
+          width: '100%',
+          videoId: videoId,
+          playerVars: {
+            'playsinline': 1,
+            'controls': 1,
+            'rel': 0,
+            'enablejsapi': 1
+          },
+          events: {
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+    };
+
+    const onPlayerStateChange = (event: any) => {
+      // YT.PlayerState.PLAYING is 1
+      if (event.data === 1) {
+        onVideoStateChange(true);
+      } 
+      // YT.PlayerState.PAUSED (2) or ENDED (0)
+      else if (event.data === 2 || event.data === 0) {
+        onVideoStateChange(false);
+      }
+    };
+
+    // Load API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+      
+      window.onYouTubeIframeAPIReady = () => {
+        initPlayer();
+      };
+    } else {
+      initPlayer();
+    }
+
+    return () => {
+      if (playerRef.current) {
+        // Cleanup if necessary, though simpler in this context to just let unmount happen
+        // playerRef.current.destroy(); 
+      }
+      onVideoStateChange(false); // Ensure audio resumes if slide changes
+    };
+  }, [videoId, onVideoStateChange]);
 
   return (
     <div className="w-full flex-1 flex flex-col justify-center items-center text-center px-6 relative overflow-hidden py-10">
@@ -802,15 +869,7 @@ const ConclusionSlide: React.FC<{ content: any }> = ({ content }) => {
           transition={{ delay: 0.7 }}
           className="w-full max-w-3xl mx-auto mb-16 relative z-10 aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-2xl bg-black"
         >
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src={`https://www.youtube.com/embed/${videoId}`} 
-              title="YouTube video player" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
+             <div id={`youtube-player-${videoId}`} className="w-full h-full" />
         </motion.div>
        )}
   
@@ -919,6 +978,7 @@ const App: React.FC = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [gameActive, setGameActive] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const content = CONTENT[lang];
   
   // Slide State
@@ -1127,7 +1187,8 @@ const App: React.FC = () => {
           >
             <div className="min-h-screen md:h-full w-full flex flex-col">
                <div className="flex-1 flex flex-col justify-center relative py-24 md:py-0">
-                  <CurrentSlideComponent content={content} />
+                  {/* @ts-ignore */}
+                  <CurrentSlideComponent content={content} onVideoStateChange={setVideoPlaying} />
                </div>
             </div>
           </motion.div>
@@ -1143,7 +1204,7 @@ const App: React.FC = () => {
         />
       )}
 
-      <AudioPlayer uiLabels={content.ui} shouldPlay={audioEnabled} />
+      <AudioPlayer uiLabels={content.ui} shouldPlay={audioEnabled} forcePause={videoPlaying} />
     </div>
   );
 };
