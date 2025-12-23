@@ -1102,8 +1102,10 @@ const App: React.FC = () => {
             exit="exit"
             className="absolute inset-0 w-full h-full overflow-y-auto md:overflow-hidden"
           >
-            <div className="min-h-full w-full py-24 md:py-0">
-               <CurrentSlideComponent content={content} />
+            <div className="min-h-full w-full py-24 md:py-0 flex flex-col">
+               <div className="flex-1 flex flex-col relative">
+                  <CurrentSlideComponent content={content} />
+               </div>
             </div>
           </motion.div>
         </AnimatePresence>
