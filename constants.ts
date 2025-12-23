@@ -32,7 +32,7 @@ export const CONTENT: Record<string, ContentData> = {
       reportTitle: "UX/UI & Kreatif Tasarım Faaliyet Raporu",
     },
     intro: {
-      welcome: "Ezan Vakti Pro & Kreatif Ekosistem Analizi",
+      welcome: "Piksellerin Ötesinde: İnteraktif Tasarım Yolculuğu",
       advisory: "Daha iyi bir deneyim için sesli ve tam ekran görüntülemeniz önerilir.",
       button: "Raporu İncele"
     },
@@ -120,7 +120,7 @@ export const CONTENT: Record<string, ContentData> = {
       reportTitle: "UX/UI & Creative Design Activity Report",
     },
     intro: {
-      welcome: "Ezan Vakti Pro & Creative Ecosystem Analysis",
+      welcome: "Beyond Pixels: An Interactive Design Journey",
       advisory: "For the best experience, audio and full-screen viewing is recommended.",
       button: "View Report"
     },
