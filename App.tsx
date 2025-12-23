@@ -123,14 +123,25 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
   const gameLoop = useCallback((time: number) => {
     if (gameState !== 'playing') return;
 
-    // Delta time calculation
-    // const deltaTime = time - lastTimeRef.current; // Not strictly used for physics here to keep it simple, but good for consistent speed
+    // Initialize time on first frame
+    if (lastTimeRef.current === 0) {
+       lastTimeRef.current = time;
+       requestRef.current = requestAnimationFrame(gameLoop);
+       return;
+    }
+
+    // Delta time calculation for consistent speed across 60Hz/120Hz screens
+    const deltaTime = time - lastTimeRef.current;
     lastTimeRef.current = time;
+    
+    // Cap delta time to avoid huge jumps on lag spikes
+    const safeDelta = Math.min(deltaTime, 64);
+    const timeScale = safeDelta / 16.667; // Normalize to ~60FPS
 
     // 1. Update Physics (Bird)
-    setBirdVelocity(v => v + GAME_GRAVITY);
+    setBirdVelocity(v => v + (GAME_GRAVITY * timeScale));
     setBirdY(y => {
-      const newY = y + (birdVelocity * 0.15); // Scale velocity to screen %
+      const newY = y + (birdVelocity * 0.15 * timeScale); // Scale velocity to screen %
       // Check collision with floor (100%) or ceiling (0%)
       if (newY >= 95) {
         setGameState('gameover');
@@ -156,7 +167,7 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
     // 3. Move Items & Check Collisions
     setItems(prevItems => {
       return prevItems
-        .map(item => ({ ...item, x: item.x - (GAME_SPEED * 0.1) })) // Move left
+        .map(item => ({ ...item, x: item.x - (GAME_SPEED * 0.1 * timeScale) })) // Move left
         .filter(item => item.x > -10); // Remove if off screen
     });
 
@@ -246,32 +257,35 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
     setBirdVelocity(0);
     setItems([]);
     setGameState('playing');
-    lastTimeRef.current = performance.now();
+    lastTimeRef.current = 0; // Reset time tracking
     lastSpawnTime.current = performance.now();
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex flex-col overflow-hidden font-sans">
+    <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex flex-col overflow-hidden font-sans touch-none select-none">
       
       {/* Top Bar */}
-      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-20">
+      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-20 pointer-events-none">
         <div className="flex items-center gap-2 bg-brand-accent/20 px-4 py-2 rounded-full border border-brand-accent/50">
           <span className="text-brand-accent font-bold uppercase tracking-wider text-xs">{content.game.score}</span>
           <span className="text-white font-bold text-xl">{score}</span>
         </div>
         <button 
           onClick={onClose}
-          className="bg-white/10 p-2 rounded-full hover:bg-white/20 text-white transition-colors"
+          className="bg-white/10 p-2 rounded-full hover:bg-white/20 text-white transition-colors pointer-events-auto"
         >
           <X size={24} />
         </button>
       </div>
 
-      {/* Game Area */}
+      {/* Game Area - Full Screen Touch Target */}
       <div 
         ref={containerRef}
-        className="relative flex-1 w-full bg-gradient-to-b from-gray-900 to-black overflow-hidden cursor-pointer"
-        onPointerDown={jump}
+        className="relative flex-1 w-full bg-gradient-to-b from-gray-900 to-black overflow-hidden cursor-pointer active:cursor-grabbing"
+        onPointerDown={(e) => {
+            e.preventDefault();
+            jump();
+        }}
       >
         {/* Grid Background */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05]" />
@@ -313,31 +327,26 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
 
         {/* Floor */}
         <div className="absolute bottom-0 w-full h-[5%] bg-gradient-to-t from-brand-accent/50 to-transparent border-t border-brand-accent z-10"></div>
+        
+        {/* Mobile Tap Hint */}
+        <div className="absolute bottom-8 left-0 w-full text-center pointer-events-none md:hidden opacity-60">
+             <span className="text-brand-accent text-sm font-bold tracking-[0.2em] animate-pulse">TAP TO FLY</span>
+        </div>
       </div>
 
-      {/* Mobile Controls (Visible on Touch devices primarily, but kept for visual affordance) */}
-      <div className="h-24 bg-black border-t border-white/10 flex items-center justify-center px-6 md:hidden">
-        <button 
-          onPointerDown={(e) => { e.stopPropagation(); jump(); }}
-          className="w-full h-16 bg-brand-accent/20 border border-brand-accent rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
-        >
-          <ArrowUp className="text-brand-accent" size={24} />
-          <span className="text-brand-accent font-bold tracking-widest uppercase">JUMP / FLY</span>
-        </button>
-      </div>
+      {/* Desktop Helper Text */}
       <div className="hidden md:flex h-12 bg-black border-t border-white/10 items-center justify-center text-gray-500 text-sm font-mono tracking-widest">
          [ SPACE TO JUMP ]
       </div>
-
 
       {/* Overlays (Start / Game Over / Win) */}
       <AnimatePresence>
         {gameState === 'start' && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6"
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6 pointer-events-none"
           >
-            <div className="text-center max-w-md pointer-events-none">
+            <div className="text-center max-w-md">
               <Gamepad2 size={64} className="mx-auto mb-6 text-brand-accent" />
               <h2 className="text-4xl font-serif text-white mb-4">{content.game.startTitle}</h2>
               <p className="text-gray-300 mb-8">{content.game.startDesc}</p>
@@ -355,7 +364,7 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
         {gameState === 'gameover' && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 z-30 flex items-center justify-center bg-red-900/40 backdrop-blur-md p-6"
+            className="absolute inset-0 z-30 flex items-center justify-center bg-red-900/40 backdrop-blur-md p-6 pointer-events-auto"
           >
             <div className="text-center">
               <h2 className="text-5xl font-serif text-white mb-2">{content.game.gameOver}</h2>
@@ -373,7 +382,7 @@ const FlappyGame: React.FC<{ content: any, onClose: () => void }> = ({ content, 
         {gameState === 'won' && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 z-40 flex items-center justify-center bg-black/90 backdrop-blur-xl p-6"
+            className="absolute inset-0 z-40 flex items-center justify-center bg-black/90 backdrop-blur-xl p-6 pointer-events-auto"
           >
             <div className="bg-gradient-to-br from-gray-900 to-black border border-brand-accent p-8 rounded-3xl max-w-md w-full text-center relative shadow-[0_0_50px_rgba(45,212,191,0.3)]">
                <motion.div 
