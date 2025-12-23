@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Seyid Turgut | Analysis Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+            colors: {
+              gold: {
+                400: '#D4AF37',
+                500: '#C5A028',
+              },
+              brand: {
+                dark: '#050505',
+                slate: '#121212',
+                accent: '#2dd4bf'
+              }
+            },
+            animation: {
+              'spin-slow': 'spin 12s linear infinite',
+              'float': 'float 6s ease-in-out infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #050505;
+        color: #ffffff;
+        overflow: hidden; /* Prevent native scroll */
+      }
+      #root {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
